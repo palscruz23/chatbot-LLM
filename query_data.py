@@ -6,7 +6,6 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_openai import ChatOpenAI
 import openai
 from dotenv import find_dotenv, load_dotenv
-import gradio
 import streamlit as st
 import re
 import random
