@@ -2,15 +2,27 @@ import argparse
 import os
 import shutil
 from langchain.document_loaders.pdf import PyPDFDirectoryLoader
+from langchain_community.document_loaders import DirectoryLoader
+from langchain_community.document_loaders import UnstructuredMarkdownLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.schema.document import Document
 from get_embedding_function import get_embedding_function
 from langchain.vectorstores.chroma import Chroma
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.chat_models import ChatOpenAI
+import openai
+from dotenv import find_dotenv, load_dotenv
+from langchain_community.document_loaders import UnstructuredHTMLLoader
+import markdown
 
+
+load_dotenv(find_dotenv())
 
 CHROMA_PATH = "chroma"
 DATA_PATH = "data"
-
+# DATA_PATH = "./data/"
+HTML_PATH = "data"
+OPENAI_API_KEY = "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"
 
 def main():
 
@@ -25,18 +37,23 @@ def main():
     # Create (or update) the data store.
     documents = load_documents()
     chunks = split_documents(documents)
+    print(len(chunks))
+    # print(chunks[40])
     add_to_chroma(chunks)
 
 
 def load_documents():
     document_loader = PyPDFDirectoryLoader(DATA_PATH)
+    # document_loader = DirectoryLoader('./data', glob='**/*.md', show_progress=True)
+    # document_loader = UnstructuredMarkdownLoader(file_path='./data/alice_in_wonderland.md', mode="elements")
+    # document_loader = UnstructuredHTMLLoader(HTML_PATH)
     return document_loader.load()
 
 
 def split_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=800,
-        chunk_overlap=80,
+        chunk_size=1500,
+        chunk_overlap=200,
         length_function=len,
         is_separator_regex=False,
     )
@@ -48,6 +65,7 @@ def add_to_chroma(chunks: list[Document]):
     db = Chroma(
         persist_directory=CHROMA_PATH, embedding_function=get_embedding_function()
     )
+
 
     # Calculate Page IDs.
     chunks_with_ids = calculate_chunk_ids(chunks)
@@ -70,6 +88,7 @@ def add_to_chroma(chunks: list[Document]):
         db.persist()
     else:
         print("✅ No new documents to add")
+    print(db.get(ids=db.get()['ids'][23]))
 
 
 def calculate_chunk_ids(chunks):
