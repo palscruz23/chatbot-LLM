@@ -9,7 +9,6 @@ from dotenv import find_dotenv, load_dotenv
 import streamlit as st
 import re
 import random
-import sqlite3
 
 # load_dotenv(find_dotenv())
 OPENAI_API_KEY = "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"
