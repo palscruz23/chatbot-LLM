@@ -2,3 +2,12 @@ pypdf
 langchain
 chromadb # Vector storage
 pytest
+openai
+tiktoken
+langchain-community
+langchain-openai
+gradio
+unstructured
+tqdm
+markdown
+streamlit
