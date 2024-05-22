@@ -9,9 +9,10 @@ from dotenv import find_dotenv, load_dotenv
 import streamlit as st
 import re
 import random
+import os
 
 # load_dotenv(find_dotenv())
-OPENAI_API_KEY = "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"
+
 from get_embedding_function import get_embedding_function
 
 CHROMA_PATH = "chroma"
@@ -51,18 +52,18 @@ def main():
     st.set_page_config(page_title="Australian Citizenship - Knowledge tester")
     st.header("Anything about Australian citizenship - Reviewer ")
     ### Questionnaire type
-
+    os.environ['OPENAI_API_KEY'] = st.secrets['OPENAI_API_KEY']
     if 'stage' not in st.session_state:
         st.session_state.stage = 0
     if 'question' not in st.session_state:
         st.session_state.question = ""
     if 'answer' not in st.session_state:
         st.session_state.answer = ""
-    
+
     # if st.session_state.stage == 0:
     #     st.button('Generate question', on_click=set_state, args=[1])
     #     st.write(st.session_state.stage)
-    
+
     # if st.session_state.stage == 1:
     #     if st.session_state.answer == "":
     #         query_text = "Generate a random multiple choice question and provide the correct answer"
@@ -72,7 +73,7 @@ def main():
     #         response = st.text_input("What is your answer:", key="answer")
     #     else:
     #         st.session_state.stage = 2
-        
+
     # if st.session_state.stage == 2:
     #     # st.write(st.session_state.question)
     #     question = st.session_state.question
@@ -89,7 +90,7 @@ def main():
         st.session_state.button = False
     if st.session_state.button == False:
         query_text = "Generate a random multiple choice question and provide the correct answer"
-        question = query_rag(query_text)
+        question = query_rag(query_text, os.environ['OPENAI_API_KEY'])
     else:
         question = st.session_state.question, st.session_state.answer
     st.write(question[0])
@@ -106,7 +107,7 @@ def main():
     except IndexError:
         st.write('Please try again. There is an error. 🙁')
         st.button("New question", on_click=clear_text)
-        
+
 
 
 
@@ -122,7 +123,7 @@ def clear_text():
     st.session_state.question = ""
 
 
-def query_rag(question: str):
+def query_rag(question: str, key: str):
     # ### QA type
     # # Prepare the DB.
     # embedding_function = get_embedding_function()
@@ -147,7 +148,7 @@ def query_rag(question: str):
 
     ### Questionnaire type
     # Prepare the DB.
-    embedding_function = get_embedding_function()
+    embedding_function = get_embedding_function(key)
     db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
     
     # Search the DB.
@@ -163,7 +164,7 @@ def query_rag(question: str):
     # model = Ollama(model="mistral")
     # response_text = model.invoke(prompt)
 
-    question_model = ChatOpenAI(api_key=OPENAI_API_KEY)
+    question_model = ChatOpenAI(api_key=key)
     question_text = question_model.invoke(question_prompt)
 
     # sources = results.metadata.get("id", None)
@@ -171,8 +172,11 @@ def query_rag(question: str):
     # question_output = question_text.content.split('Correct Answer:')
     question_output = re.split("correct answer: ", question_text.content, flags=re.IGNORECASE)
     # formatted_response = f"Response: {question_text.content}\n\nSources: {sources}" 
+    question_output[0] = question_output[0].replace("\n", "  \n")
     print("Sample: " + str(question_text))
     print("Sample123: " + str(question_output))
+    print("Sample12345: " + str(question_output[0]))
+
     return question_output
 
 # def answer_rag(question: str, response: str):
