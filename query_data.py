@@ -144,7 +144,7 @@ def query_rag(question: str, key: str):
     # # model = Ollama(model="mistral")
     # # response_text = model.invoke(prompt)
 
-    # model = ChatOpenAI(model_name= "gpt-3.5-turbo-0125", api_key=OPENAI_API_KEY)
+    # model = ChatOpenAI(model_name= "gpt-4o", api_key=OPENAI_API_KEY)
     # response_text = model.invoke(prompt)
 
     # sources = [doc.metadata.get("id", None) for doc, _score in results]
@@ -168,7 +168,7 @@ def query_rag(question: str, key: str):
     # model = Ollama(model="mistral")
     # response_text = model.invoke(prompt)
 
-    question_model = ChatOpenAI(api_key=key)
+    question_model = ChatOpenAI(model_name= "gpt-4o", api_key=key)
     question_text = question_model.invoke(question_prompt)
 
     # sources = results.metadata.get("id", None)
