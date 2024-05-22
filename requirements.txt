@@ -10,3 +10,4 @@ unstructured
 markdown
 streamlit
 pysqlite3
+sqlite3
