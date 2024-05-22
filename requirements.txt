@@ -9,4 +9,4 @@ langchain-openai
 unstructured
 markdown
 streamlit
-pysqlite3
+pysqlite3-binary
