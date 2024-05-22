@@ -22,7 +22,6 @@ CHROMA_PATH = "chroma"
 DATA_PATH = "data"
 # DATA_PATH = "./data/"
 HTML_PATH = "data"
-OPENAI_API_KEY = "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"
 
 def main():
 
